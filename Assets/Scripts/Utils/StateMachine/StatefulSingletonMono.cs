@@ -1,74 +1,45 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using Utils;
 
 namespace StateMachine {
 
-	public class StatefulSingletonMono<T, TEnum> : StatefulObjectBase<T, TEnum> where T : MonoBehaviour where TEnum : System.IConvertible {
+	public class StatefulSingletonMono<T, TEnum> : SingletonMono<T> where T : MonoBehaviour where TEnum : System.IConvertible {
 
 		/// <summary>
-		/// インスタンス
+		/// 所持しているStateのList
 		/// </summary>
-		private static volatile T instance;
+		protected List<State<T>> stateList = new List<State<T>>();
+
+		protected StateMachine<T> stateMachine;
 
 		/// <summary>
-		/// 同期オブジェクト
+		/// Stateの切り替え
 		/// </summary>
-		private static object syncObj = new object (); 
+		public virtual void ChangeState(TEnum state) {
+			if (stateMachine == null) { return; }
+			stateMachine.ChangeState(stateList[state.ToInt32(null)]);
+		}
 
 		/// <summary>
-		/// インスタンスのgetter/setter
+		/// 現在のStateの確認
 		/// </summary>
-		public static T Instance {
-			get {
-				// アプリ終了時に，再度インスタンスの呼び出しがある場合に，オブジェクトを生成することを防ぐ
-				if(applicationIsQuitting) {
-					return null;
-				}
-				// インスタンスがない場合に探す
-				if(instance == null) {
-					instance = FindObjectOfType<T>() as T;
+		public virtual bool IsCurrentState(TEnum state) {
+			if (stateMachine == null) { return false; }
+			return stateMachine.CurrentState == stateList[state.ToInt32(null)];
+		}
 
-					// 複数のインスタンスがあった場合
-					if ( FindObjectsOfType<T>().Length > 1 ) {
-						return instance;
-					}
-
-					// Findで見つからなかった場合、新しくオブジェクトを生成
-					if (instance == null) {
-						// 同時にインスタンス生成を呼ばないためにlockする
-						lock (syncObj) { 
-							GameObject singleton = new GameObject();
-							// シングルトンオブジェクトだと分かりやすいように名前を設定
-							singleton.name = typeof(T).ToString() + " (singleton)";
-							instance = singleton.AddComponent<T>();
-							// シーン変更時に破棄させない
-							DontDestroyOnLoad(singleton);
-						}
-					}
-
-				}
-				return instance;
-			}
-			// インスタンスをnull化するときに使うのでprivateに
-			private set {
-				instance = value;
+		protected virtual void Update() {
+			if (stateMachine != null) {
+				stateMachine.Update ();
 			}
 		}
 
-		/// <summary>
-		/// アプリが終了しているかどうか
-		/// </summary>
-		static bool applicationIsQuitting = false;
 
-		void OnApplicationQuit() {
-			applicationIsQuitting = true;
+
+		public virtual void Initialize() {
+			Debug.Log (typeof(T).ToString() + " is Singleton, but not implemented a mothod 'Initialize'");
 		}
-
-		void OnDestroy () {
-			Instance = null;
-		}
-
-		// コンストラクタをprotectedにすることでインスタンスを生成出来なくする
-		protected StatefulSingletonMono () {}
 	}
 }
