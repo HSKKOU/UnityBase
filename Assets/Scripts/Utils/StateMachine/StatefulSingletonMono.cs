@@ -37,9 +37,11 @@ namespace StateMachine {
 		}
 
 
-
+		/// <summary>
+		/// StateMachineを積んだclassは必ずInitializeメソッドを実装する。
+		/// </summary>
 		public virtual void Initialize() {
-			Debug.Log (typeof(T).ToString() + " is Singleton, but not implemented a mothod 'Initialize'");
+			this.stateMachine = new StateMachine<T>();
 		}
 	}
 }
