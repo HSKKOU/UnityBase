@@ -14,6 +14,9 @@ namespace StateMachine {
 
 		protected StateMachine<T> stateMachine;
 
+		/// <summary>
+		/// 現在のState
+		/// </summary>
 		[SerializeField]
 		protected TEnum currentState;
 
