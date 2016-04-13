@@ -1,0 +1,4 @@
+# UnityBase
+StateMachine実装Unity
+
+とりあえずでStateMachine実装したゲームのベースになるやつを作ってみた。
