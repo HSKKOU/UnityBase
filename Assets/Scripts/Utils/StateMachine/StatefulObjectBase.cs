@@ -37,5 +37,13 @@ namespace StateMachine {
 				stateMachine.Update ();
 			}
 		}
+
+
+		/// <summary>
+		/// StateMachineを積んだclassは必ずInitializeメソッドを実装する。
+		/// </summary>
+		public virtual void Initialize() {
+			this.stateMachine = new StateMachine<T>();
+		}
 	}
 }
